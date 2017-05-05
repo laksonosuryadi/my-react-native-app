@@ -1,0 +1,40 @@
+{
+  "name": "NavigationProject",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^0.16.1",
+    "enzyme": "^2.8.2",
+    "fetch-mock": "^5.10.0",
+    "native-base": "^2.1.3",
+    "react": "16.0.0-alpha.6",
+    "react-addons-test-utils": "^15.5.1",
+    "react-dom": "^15.5.4",
+    "react-native": "0.44.0",
+    "react-navigation": "^1.0.0-beta.9",
+    "react-redux": "^5.0.4",
+    "redux": "^3.6.0",
+    "redux-mock-store": "^1.2.3",
+    "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-jest": "19.0.0",
+    "babel-preset-react-native": "1.9.1",
+    "jest": "19.0.2",
+    "react-test-renderer": "^16.0.0-alpha.6"
+  },
+  "jest": {
+    "preset": "react-native",
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-native|react-navigation|native-base-shoutem-theme|@shoutem)",
+      "src/App.js"
+    ]
+  }
+}

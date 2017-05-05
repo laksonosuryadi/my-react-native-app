@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render PhotoItem successfully 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "borderColor": "white",
+      "borderWidth": 1,
+      "height": 245.25,
+      "justifyContent": "center",
+      "marginBottom": 0,
+      "marginLeft": 1,
+      "marginRight": 1,
+      "position": "relative",
+      "width": 245.25,
+    }
+  }
+>
+  <View
+    accessibilityComponentType={undefined}
+    accessibilityLabel={undefined}
+    accessibilityTraits={undefined}
+    accessible={true}
+    hasTVPreferredFocus={undefined}
+    hitSlop={undefined}
+    isTVSelectable={true}
+    onLayout={undefined}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Array [
+        Object {
+          "backgroundColor": "transparent",
+        },
+        undefined,
+      ]
+    }
+    testID={undefined}
+    tvParallaxProperties={undefined}
+  >
+    <Image
+      source={
+        Object {
+          "uri": "",
+        }
+      }
+      style={
+        Object {
+          "height": "100%",
+          "width": 245.25,
+        }
+      }
+    />
+  </View>
+</View>
+`;
