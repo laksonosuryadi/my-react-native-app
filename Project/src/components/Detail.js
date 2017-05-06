@@ -4,9 +4,14 @@ import {
   View,
   Image,
   ScrollView,
+  TouchableHighlight,
+  CameraRoll,
+  Platform,
+  Alert
 } from 'react-native';
 
 import { Icon, Col, Grid } from 'native-base';
+import RNFetchBlob from 'react-native-fetch-blob'; //library to save picture file
 
 class Detail extends Component {
   constructor(props){
@@ -14,6 +19,25 @@ class Detail extends Component {
   }
 
   static navigationOptions = { title : '700px' }
+
+  saveToCameraRoll = (image) => {
+    if (Platform.OS === 'android') {
+      RNFetchBlob
+      .config({
+        fileCache : true,
+        appendExt : 'jpg'
+      })
+      .fetch('GET', image.image_url)
+      .then((res) => {
+        CameraRoll.saveToCameraRoll(res.path())
+          .then(Alert.alert('Success', 'Photo has been added to your Gallery!'))
+          .catch(err => console.log('err:', err))
+      })
+    } else { //this else part is for iOS
+      CameraRoll.saveToCameraRoll(image.image_url)
+        .then(Alert.alert('Success', 'Photo has been added to your Gallery!'))
+    }
+  }
 
   render() {
     const {params} = this.props.navigation.state
@@ -27,10 +51,17 @@ class Detail extends Component {
             />
             <Text style={styles.headerText}>{params.detail.user.fullname}</Text>
           </View>
-          <Image
-              style={{width:400, height: 400}}
-              source={{uri: params.detail.image_url}}
-          />
+
+          <TouchableHighlight
+            onPress={() => this.saveToCameraRoll(params.detail)}
+            underlayColor='transparent'
+          >
+            <Image
+                style={{width:400, height: 400}}
+                source={{uri: params.detail.image_url}}
+            />
+          </TouchableHighlight>
+
           <View style={styles.description}>
             <Text style={{fontSize: 20, fontWeight:'bold', marginBottom: 10}}>{params.detail.name}</Text>
             <View style={styles.spaced}>
@@ -51,11 +82,11 @@ class Detail extends Component {
             <Text>Aperture: {params.detail.aperture}</Text>
             <Text>Shutter Speed: {params.detail.shutter_speed}</Text>
           </View>
+
         </ScrollView>
       </View>
     )
-  }
-
+  } //END OF RENDER
 }
 
 const styles = {

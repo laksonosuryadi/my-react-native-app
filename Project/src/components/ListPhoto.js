@@ -7,19 +7,27 @@ import {
   ListView,
   Image,
   RefreshControl,
-  TouchableHighlight
+  TouchableHighlight,
+  StatusBar,
+  CameraRoll,
+  Dimensions,
+  Modal
 } from 'react-native';
 
-import { Col, Grid, Spinner, Footer, FooterTab, Button, Icon } from 'native-base';
+import { Col, Grid, Spinner, Footer, FooterTab, Button, Icon, Container } from 'native-base';
 
 import PhotoItem from './PhotoItem'
-import { fetchPhoto, fetchMyData } from '../actions'
+import { fetchPhoto, fetchMyData, fetchMyPhoto } from '../actions'
+
+const width = Dimensions.get('window').width
 
 class ListPhoto extends Component {
   constructor(props) {
     super(props)
     this.state = {
       refreshing: false,
+      modalVisible: false,
+      photos: []
     };
   }
 
@@ -28,6 +36,7 @@ class ListPhoto extends Component {
   componentDidMount() {
     this.props.fetchPhoto()
     this.props.fetchMyData()
+    this.props.fetchMyPhoto()
   }
 
   afterRefresh() {
@@ -40,52 +49,114 @@ class ListPhoto extends Component {
     this.afterRefresh()
   }
 
+  getPhotos = () => {
+    CameraRoll.getPhotos({
+      first: 20,
+      assetType: 'All'
+    })
+    .then(r => this.setState({ photos: r.edges }))
+  }
+
+  toggleModal = () => {
+    this.setState({ modalVisible: !this.state.modalVisible });
+  }
+
+
   render () {
     const { navigate } = this.props.navigation
     return (
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.content}
-          refreshControl={
-           <RefreshControl
-             refreshing={this.state.refreshing}
-             onRefresh={this._onRefresh.bind(this)}
-           />
-        }>
-          { this.props.photos.length !== 0 &&
-            <View style={{flex:1, alignItems:'center', justifyContent:'center'}}>
-              <Text style={{fontSize:25, marginTop:10, marginBottom:10}}>20 Popular Photos</Text>
-            </View>
-          }
+      <Container>
+        <View style={styles.container}>
+          <ScrollView
+            style={styles.content}
+            refreshControl={
+             <RefreshControl
+               refreshing={this.state.refreshing}
+               onRefresh={this._onRefresh.bind(this)}
+             />
+          }>
+            <StatusBar
+              backgroundColor='maroon'
+              barStyle='light-content'
+            />
 
-          { this.props.photos.length === 0 && <Spinner color='grey' style={{marginTop:200}}/>}
-
-          <View style={styles.grid}>
-              {
-                this.props.photos.map(photo => (
-                  <PhotoItem key={photo.id} photo={photo} navigation={this.props.navigation} />
-                  )
-                )
+              { this.props.photos.length !== 0 &&
+                <View style={{flex:1, alignItems:'center', justifyContent:'center'}}>
+                  <Text style={{fontSize:25, marginTop:10, marginBottom:10}}>20 Popular Photos</Text>
+                </View>
               }
-          </View>
 
-          { this.props.photos.length !== 0 &&
-            <Footer>
-              <FooterTab>
-                <Button onPress={() => navigate('ListPhoto')}>
-                  <Icon name="home" />
-                </Button>
-                <Button>
-                  <Icon name="camera" />
-                </Button>
-                <Button onPress={() => navigate('About', {data: this.props.user})}>
-                  <Icon name="person" />
-                </Button>
-              </FooterTab>
-            </Footer>
-          }
-        </ScrollView>
-      </View>
+              { this.props.photos.length === 0 && <Spinner color='grey' style={{marginTop:200}}/>}
+
+              <View style={styles.grid}>
+                  {
+                    this.props.photos.map(photo => (
+                      <PhotoItem key={photo.id} photo={photo} navigation={this.props.navigation} />
+                      )
+                    )
+                  }
+              </View>
+          </ScrollView>
+
+          <Modal
+            animationType={"slide"}
+            transparent={false}
+            visible={this.state.modalVisible}
+            onRequestClose={() => console.log('closed')}
+          >
+          <View style={styles.modalContainer}>
+            <Button iconLeft light
+              onPress={this.toggleModal}
+              style={{marginBottom:15}}
+            >
+              <Icon name='arrow-back' /><Text>Back</Text>
+            </Button>
+            <ScrollView
+              contentContainerStyle={styles.scrollView}>
+              {
+                this.state.photos.map((p, i) => {
+                  return (
+                    <TouchableHighlight
+                      key={i}
+                      underlayColor='transparent'
+
+                    >
+                      <Image
+                        style={{
+                          width: width/3,
+                          height: width/3
+                        }}
+                        source={{uri: p.node.image.uri}}
+                      />
+                    </TouchableHighlight>
+                  )
+                })
+              }
+            </ScrollView>
+          </View>
+        </Modal>
+
+            { this.props.photos.length !== 0 &&
+              <Footer>
+                <FooterTab style={{backgroundColor:'maroon'}}>
+                  <Button onPress={() => navigate('ListPhoto')}>
+                    <Icon name="home" style={{color:'white'}}/>
+                  </Button>
+                  <Button onPress={() => navigate('Camera')}>
+                    <Icon name="camera" style={{color:'white'}}/>
+                  </Button>
+                  <Button onPress={() => { this.toggleModal(); this.getPhotos() }}>
+                    <Icon name="md-add" style={{color:'white'}}/>
+                  </Button>
+                  <Button onPress={() => navigate('About', {data: this.props.user, fotoku: this.props.myPhotos})}>
+                    <Icon name="person" style={{color:'white'}}/>
+                  </Button>
+                </FooterTab>
+              </Footer>
+            }
+
+        </View>
+      </Container>
     )
   }
 }
@@ -122,17 +193,27 @@ const styles = {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'black'
+  },
+  modalContainer: {
+    paddingTop: 20,
+    flex: 1
+  },
+  scrollView: {
+    flexWrap: 'wrap',
+    flexDirection: 'row'
   }
 }
 
 const mapStateToProps = (state) => ({
   photos: state.data.photos,
-  user: state.data.user
+  user: state.data.user,
+  myPhotos: state.data.myPhotos
 })
 
 const mapDispatchToProps = dispatch => ({
   fetchPhoto: () => dispatch(fetchPhoto()),
-  fetchMyData: () => dispatch(fetchMyData())
+  fetchMyData: () => dispatch(fetchMyData()),
+  fetchMyPhoto: () => dispatch(fetchMyPhoto())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListPhoto);

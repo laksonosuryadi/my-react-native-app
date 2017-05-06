@@ -1,6 +1,7 @@
-import { fetchPhoto, fetchMyData } from './photoAction'
+import { fetchPhoto, fetchMyData, fetchMyPhoto } from './photoAction'
 
 export {
   fetchPhoto,
-  fetchMyData
+  fetchMyData,
+  fetchMyPhoto
 }
